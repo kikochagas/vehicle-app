@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from 'react'
 import { VehicleModel } from './VehicleModel'
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllModelsApi, addModelApi, deleteModelApi, updateModelApi } from '../../actions/vehicleModelActions';
+import { addModelApi, deleteModelApi, updateModelApi } from '../../actions/vehicleModelActions';
 import { ModelForm } from './ModelForm';
 import { Button, Modal } from 'react-bootstrap';
 import { types } from '../../helpers/types';
 import { Pagination } from '../ui/Pagination';
+import {fetchModels} from '../../reducers/vehicleModelSlice';
 export const VehicleModelList = () => {
-  const [models, setModels] = useState([])
+
   const [modelObj, setModelObj] = useState({})
   const dispatch = useDispatch();
-  dispatch(getAllModelsApi())
-  const state = useSelector(state => state)
+ 
   const [show, setShow] = useState(false);
   const [modalAction, setModalAction] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10)
 
-  useEffect(() => {
-    if(state?.vehicleModel?.values){
-      setModels(state?.vehicleModel?.values?.data)
-    }
 
-  }, [state])
+  const {value:models, loading, error} = useSelector((state) => state.vehicleModel)
+  useEffect(() => {
+      dispatch(fetchModels())
+  }, [dispatch])
 
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
@@ -48,13 +47,9 @@ export const VehicleModelList = () => {
 
   const handleDelete = (id) =>{
     dispatch(deleteModelApi(id));
-    //setModels(models.filter(x=>x.id !== id))
-    window.location.reload(false);
-
   }
 
   const handleEdit = (model) =>{
-     // console.log(model)
       setModelObj(model);
       handleShowModal(types.update)
   }

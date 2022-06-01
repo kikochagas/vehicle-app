@@ -1,61 +1,25 @@
 import { REACT_APP_API } from "../helpers/Api_url"
-import { types } from "../helpers/types"
-import { useFetch } from "../hooks/useFetch/useFetch"
+import { addVehicle, deleteVehicle, updateVehicle } from "../reducers/vehicleSlice";
 const URL = REACT_APP_API+'Vehicle';
 
-const getAll = (values) => {
-    return {
-        type: types.getAll,
-        payload: {
-            values: values
-        }
 
-    }
-}
-
-export const getAllVehiclesApi = () => {
-    return (dispatch) => {
-        const { data, error } = useFetch(URL);
-        if(!error) {
-            console.log(data)
-            dispatch(getAll({data}));  
-        }else{
-            console.error(error);
-        }
-    }
-}
-
-const add = (data) => {
-    return {
-        type: types.add,
-        payload: data
-    }
-}
-
-export const addVehicleApi = ({vin, deliveryDate, modelId}) => {
+export const addVehicleApi = ({vin, deliveryDate, modelId, model}) => {
     return (dispatch) => {
             
         fetch(URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ vin: vin, deliveryDate: deliveryDate, modelId:modelId })
+            body: JSON.stringify({ vin: vin, deliveryDate: deliveryDate, modelId:modelId, model: model })
         })
             .then( resp => resp.json() )
             .then( data => {
-                dispatch(add(data));
+                dispatch(addVehicle(data));
             })
             .catch( (error) => {
                 console.error(error);
             })
     }
     
-}
-
-const update = (data) => {
-    return {
-        type: types.update,
-        payload: {...data}
-    }
 }
 
 export const updateVehicleApi = (vehicle) => {
@@ -68,20 +32,13 @@ export const updateVehicleApi = (vehicle) => {
         })
             .then()
             .then( () => {
-                dispatch(update(vehicle));
+                dispatch(updateVehicle(vehicle));
             })
             .catch( (error) => {
                 console.error(error);
             })
     }
     
-}
-
-const deleteVehicle = (id) => {
-    return {
-        type: types.delete,
-        payload: id
-    }
 }
 
 export const deleteVehicleApi = (id) => {

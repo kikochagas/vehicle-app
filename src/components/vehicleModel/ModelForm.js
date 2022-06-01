@@ -8,7 +8,7 @@ export const ModelForm = ({action = types.add, model={}, handleSubmitModel}) => 
 };
 const [ {name}, handleInputChange, reset ] = useForm( initialForm );
 const handleSubmit = (e) =>{
-  //e.preventDefault();
+  e.preventDefault();
   if(name.trim().length <= 1){
       return;
   }

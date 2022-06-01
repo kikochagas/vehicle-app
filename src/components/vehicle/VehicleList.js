@@ -1,34 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllVehiclesApi, addVehicleApi, deleteVehicleApi, updateVehicleApi } from '../../actions/vehicleActions';
+import { addVehicleApi, deleteVehicleApi, updateVehicleApi } from '../../actions/vehicleActions';
 import { Button, Modal } from 'react-bootstrap';
 import { types } from '../../helpers/types';
 import { Pagination } from '../ui/Pagination';
 import { Vehicle } from './Vehicle';
 import { VehicleForm } from './VehicleForm';
+import {fetchVehicles} from '../../reducers/vehicleSlice';
 export const VehicleList = () => {
-  const [vehicles, setVehicles] = useState([])
   const [vehicleObj, setVehicleObj] = useState({})
   const dispatch = useDispatch();
-  dispatch(getAllVehiclesApi())
-  const state = useSelector(state => state)
+
   const [show, setShow] = useState(false);
   const [action, setAction] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10)
-
+  const {value:vehicles, loading, error} = useSelector((state) => state.vehicle)
   useEffect(() => {
-    if(state?.vehicle?.values){
-      setVehicles(state?.vehicle?.values?.data)
-    }
-
-  }, [state])
+      dispatch(fetchVehicles());
+  }, [dispatch])
 
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const currentItems = vehicles?.slice(indexOfFirst, indexOfLast);
-  const totalPagesNum = Math.ceil(vehicles?.length / itemsPerPage)
-
+  const totalPagesNum = Math.ceil(vehicles?.length / itemsPerPage);
   const handleShowModal = (action) =>{
     setAction(action)
     return setShow(true);
@@ -43,19 +38,15 @@ export const VehicleList = () => {
       }else{
         dispatch(updateVehicleApi(vehicle))
       }
-     //console.log(vehicle)
     handleCloseModal();
   }
 
   const handleDelete = (id) =>{
     dispatch(deleteVehicleApi(id));
-    //setVehicles(vehicles.filter(x=>x.requestId !== id))
-    window.location.reload(false);
 
   }
 
   const handleEdit = (vehicle) =>{
-     // console.log(vehicle)
       setVehicleObj(vehicle);
       handleShowModal(types.update)
   }

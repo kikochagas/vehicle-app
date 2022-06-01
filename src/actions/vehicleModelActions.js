@@ -1,37 +1,6 @@
 import { REACT_APP_API } from "../helpers/Api_url"
-import { types } from "../helpers/types"
-import { useFetch } from "../hooks/useFetch/useFetch"
+import { addModel, deleteModel, updateModel } from "../reducers/vehicleModelSlice";
 const URL = REACT_APP_API+'Model';
-const getAll = (values) => {
-    return {
-        type: types.getAll,
-        payload: {
-            values: values
-        }
-
-    }
-}
-
-export const getAllModelsApi = () => {
-    return (dispatch) => {
-        const { data, error } = useFetch(URL);
-        if(!error) {
-            dispatch(getAll({data}));  
-        }else{
-            console.error(error);
-        }
-    }
-}
-
-const add = ({id, name}) => {
-    return {
-        type: types.add,
-        payload: {
-            id: id,
-            name: name
-        }
-    }
-}
 
 export const addModelApi = (name) => {
     return (dispatch) => {
@@ -43,23 +12,13 @@ export const addModelApi = (name) => {
         })
             .then( resp => resp.json() )
             .then( data => {
-                dispatch(add(data));
+                dispatch(addModel(data));
             })
             .catch( (error) => {
                 console.error(error);
             })
     }
     
-}
-
-const update = ({id, name}) => {
-    return {
-        type: types.update,
-        payload: {
-            id: id,
-            name: name
-        }
-    }
 }
 
 export const updateModelApi = (model) => {
@@ -72,7 +31,7 @@ export const updateModelApi = (model) => {
         })
             .then()
             .then( () => {
-                dispatch(update(model));
+                dispatch(updateModel(model));
             })
             .catch( (error) => {
                 console.error(error);
@@ -80,14 +39,6 @@ export const updateModelApi = (model) => {
     }
     
 }
-
-const deleteModel = (id) => {
-    return {
-        type: types.delete,
-        payload: id
-    }
-}
-
 export const deleteModelApi = (id) => {
     return (dispatch) => {
             

@@ -2,19 +2,17 @@ import React, { useEffect, useState } from 'react'
 import { Button, Form } from 'react-bootstrap'
 import { types } from '../../helpers/types.js'
 import {useForm} from '../../hooks/useForm/useForm.js'
-import { getAllModelsApi } from '../../actions/vehicleModelActions';
 import { useDispatch, useSelector } from 'react-redux'
-
+import {fetchModels} from '../../reducers/vehicleModelSlice';
 export const VehicleForm = ({action = types.add, vehicle={}, handleSubmitVehicle}) => {
-  const [models, setModels] = useState([])
   const dispatch = useDispatch();
-  dispatch(getAllModelsApi())
-  const state = useSelector(state => state)
+  
+  const {value:models, loading, error} = useSelector((state) => state.vehicleModel)
   useEffect(() => {
-    if(state?.vehicleModel?.values){
-      setModels(state?.vehicleModel?.values?.data)
+    if(models.length === 0) {
+      dispatch(fetchModels())
     }
-  }, [state])
+  }, [dispatch])
 
 
 let initialForm = {
@@ -30,13 +28,13 @@ if(action === types.update){
 }
 
 const [ {vin, deliveryDate, modelId}, handleInputChange, reset ] = useForm( initialForm );
-console.log(deliveryDate.split('T')[0])
 const handleSubmit = (e) =>{
-  //e.preventDefault();
+  e.preventDefault();
   if(vin.trim().length <= 1 || deliveryDate.trim().length <= 1 || modelId.trim().length <= 1){
       return;
   }
-  handleSubmitVehicle({...vehicle, vin, deliveryDate, modelId});
+  const name = models.find(x => x.id === modelId).name;
+  handleSubmitVehicle({...vehicle, vin, deliveryDate, modelId, model:{id:modelId, name:name}});
   reset();
 }
   return (
@@ -64,7 +62,7 @@ const handleSubmit = (e) =>{
             <option value=''>Select...</option>
             {
               models?.map(model =>
-                <option value={model.id}>{model.name}</option>)
+                <option key={model.id} value={model.id}>{model.name}</option>)
 
             }
           </Form.Control>
